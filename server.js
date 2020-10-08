@@ -175,17 +175,41 @@ const getAllCommentsWithUser = () =>{
 // getAllCommentsWithUser();
 
     // 2.7 getPostsWithLikes
+
+const getUsernamesOfPeopleWhoLikedPost = postId =>{
+    return db.many(`
+        SELECT post_id, name FROM likes
+            INNER JOIN users
+            ON likes.user_id = users.id
+                WHERE post_id = $1;
+    `, postId)
+    .then(names=>{
+        return names;
+    })
+    .catch((e)=>{
+        console.log(e);
+    })
+}
+
 const getPostsWithLikes = () =>{
     db.many(`
-    SELECT count(*) as num_likes, url FROM likes
+    SELECT count(*) as num_likes, url, post_id FROM likes
         INNER JOIN posts
         ON likes.post_id = posts.id
-            GROUP BY url
+            GROUP BY url, post_id
             ORDER BY num_likes DESC;
     `)
     .then(comments=>{
         comments.forEach(comment=>{
-            console.log(comment.url + ' Has ' + comment.num_likes + ' Number of likes');
+            const names = getUsernamesOfPeopleWhoLikedPost(comment.post_id);
+            names.then((nameList)=>{
+                const name = nameList.map(element=>{
+                    return element.name;
+                })
+                name.join('');
+                console.log(`\nPost: ${comment.url} has ${comment.num_likes} likes`);
+                console.log(`It was liked by ${name}\n`)
+            })
         });
     })
     .catch((e)=>{
