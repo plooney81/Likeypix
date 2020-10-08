@@ -22,6 +22,20 @@ const db = pgp(config);
 //     console.log(e);
 // })
 
+const getAllUsers = () => {
+    db.many(`
+    SELECT * FROM users;
+    `)
+    .then((users)=>{
+        users.forEach((user)=>{
+            console.log(user.id +' ' + user.name + ' : ' + user.email);
+        })
+    })
+    .catch((e)=>{
+        console.log(e);
+    })
+}
+
 
 
 // 1. Create
@@ -37,24 +51,12 @@ const createNewUser = (name, email)=>{
     })
 }
 
-createNewUser('Pete', 'Loo@yahoo.com');
+// createNewUser('Pete', 'Loo@yahoo.com');
+// getAllUsers();
 
 
 // 2. Read
     //  2.1 Get all users
-const getAllUsers = () => {
-    db.many(`
-    SELECT * FROM users;
-    `)
-    .then((users)=>{
-        users.forEach((user)=>{
-            console.log(user.name + ' : ' + user.email);
-        })
-    })
-    .catch((e)=>{
-        console.log(e);
-    })
-}
 // getAllUsers();
 
     // 2.2 Get all posts
@@ -231,8 +233,21 @@ const getPostsWithLikes = () =>{
 // getPostsWithLikes();
 
 // 3. Update
+    //3.1 Update a specific users name
+const updateSpecificUsersName = (userId, newName)=>{
+    const info = {id: userId, name: newName};
+    const q = "UPDATE users SET name = ${name} WHERE id = ${id}";
+    db.none(q, info)
+    .then((r)=>{
+        console.log('Updated');
+    })
+    .catch(e=>{
+        console.log(e);
+    })
+}
 
-
+updateSpecificUsersName(6, 'David');
+getAllUsers();
 
 // 4. Delete
 
