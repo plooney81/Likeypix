@@ -29,7 +29,7 @@ const db = pgp(config);
 
 
 // 2. Read
-//  2.1 Get all users
+    //  2.1 Get all users
 const getAllUsers = () => {
     db.many(`
     SELECT * FROM users;
@@ -45,7 +45,7 @@ const getAllUsers = () => {
 }
 // getAllUsers();
 
-// 2.2 Get all posts
+    // 2.2 Get all posts
 const getAllPosts = () => {
     db.many(`
         SELECT * FROM posts;
@@ -62,15 +62,53 @@ const getAllPosts = () => {
 
 //getAllPosts();
 
-// 2.3 Get all posts from a specific user
-const getBySpecificUser = specId => {
+    // 2.3 Get all posts from a specific user and print their name
+        // 1st way using SQL
+// const getSpecificUsersPosts = specId => {
+//     db.many(`
+//     SELECT posts.id, url, name FROM posts
+//         INNER JOIN users
+//         ON users.id = posts.user_id
+//         WHERE user_id = $1;
+//     `, specId)
+//     .then(posts => {
+//         posts.forEach(post => {
+//             console.log(`${post.url} : ${post.name}`);
+//         })
+//     })
+//     .catch((e)=>{
+//         console.log(e);
+//     })
+// }
+
+
+        // 2nd way using JS promises
+const getUserById = userId =>{
+        return db.one(`
+        SELECT * FROM users
+            WHERE id = $1;
+        `, userId)
+        .then(user=>{
+            return user;
+        })
+        .catch(e => {
+            console.log(e);
+        })
+}
+
+const getSpecificUsersPosts = specId => {
+
+    
     db.many(`
-        SELECT * FROM posts
-            WHERE user_id = $1;
+    SELECT * FROM posts
+    WHERE user_id = $1;
     `, specId)
-    .then((posts)=>{
-        posts.forEach((post)=>{
-            console.log(`${post.url} : ${post.user_id}`);
+    .then(posts => {
+        posts.forEach(post => {
+            const user = getUserById(specId);
+                user.then(theUser => {
+                    console.log(`${theUser.name} : ${post.url}`);
+                })
         })
     })
     .catch((e)=>{
@@ -78,7 +116,7 @@ const getBySpecificUser = specId => {
     })
 }
 
-getBySpecificUser(5);
+getSpecificUsersPosts(5);
 
 // 3. Update
 
@@ -92,4 +130,4 @@ getBySpecificUser(5);
 //Its okay to leave this out for an express app, BUT
 // for our command line app, we want this in here so we can
 // get our terminal back.
-pgp.end(); 
+// pgp.end(); 
