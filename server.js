@@ -25,7 +25,19 @@ const db = pgp(config);
 
 
 // 1. Create
+const createNewUser = (name, email)=>{
+    const info = {userName: name, userEmail: email};
+    const q = "INSERT INTO users VALUES (DEFAULT, ${userName}, ${userEmail})"
+    db.none(q, info)
+    .then(()=>{
+        console.log('Added');
+    })
+    .catch(e=>{
+        console.error(e);
+    })
+}
 
+createNewUser('Pete', 'Loo@yahoo.com');
 
 
 // 2. Read
@@ -216,7 +228,7 @@ const getPostsWithLikes = () =>{
         console.log(e);
     })
 }
-getPostsWithLikes();
+// getPostsWithLikes();
 
 // 3. Update
 
