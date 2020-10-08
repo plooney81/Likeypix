@@ -116,7 +116,83 @@ const getSpecificUsersPosts = specId => {
     })
 }
 
-getSpecificUsersPosts(5);
+// getSpecificUsersPosts(5);
+
+    // 2.4 getAllComments
+const getAllComments = () => {
+    db.many(`
+    SELECT * FROM comments;
+    `)
+    .then(comments =>{
+        comments.forEach(comment=>{
+            console.log(`${comment.comment} : ${comment.created_at}`);
+        })
+    })
+    .catch((e)=>{
+        console.log(e);
+    })
+}
+// getAllComments();
+
+    // 2.5 getAllCommentsByUserId
+const getCommentsBySpecificId = (specId) => {
+    db.many(`
+        SELECT * FROM comments
+            WHERE user_id = $1;
+    `, specId)
+    .then(comments =>{
+        const user = getUserById(specId);
+        user.then(theUser=>{
+            comments.forEach(comment=>{
+                console.log(`${comment.comment} -> ${theUser.name}`)
+            })
+        })
+    })
+    .catch((e)=>{
+        console.log(e);
+    })
+}
+// getCommentsBySpecificId(1);
+
+    // 2.6 getAllCommentsWithUser
+const getAllCommentsWithUser = () =>{
+    db.many(`
+        SELECT * FROM comments
+            INNER JOIN users
+            ON users.id = comments.user_id
+            INNER JOIN posts
+            ON posts.id = comments.post_id;
+    `)
+    .then(comments=>{
+        comments.forEach(comment =>{
+            console.log(`${comment.comment} -->On Post--> ${comment.url} -->Was Said By--> ${comment.name}`);
+        });
+    })
+    .catch((e)=>{
+        console.log(e);
+    })
+}
+// getAllCommentsWithUser();
+
+    // 2.7 getPostsWithLikes
+const getPostsWithLikes = () =>{
+    db.many(`
+    SELECT count(*) as num_likes, url FROM likes
+        INNER JOIN posts
+        ON likes.post_id = posts.id
+            GROUP BY url
+            ORDER BY num_likes DESC;
+    `)
+    .then(comments=>{
+        comments.forEach(comment=>{
+            console.log(comment.url + ' Has ' + comment.num_likes + ' Number of likes');
+        });
+    })
+    .catch((e)=>{
+        console.log(e);
+    })
+}
+getPostsWithLikes();
 
 // 3. Update
 
