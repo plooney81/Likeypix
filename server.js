@@ -246,13 +246,28 @@ const updateSpecificUsersName = (userId, newName)=>{
     })
 }
 
-updateSpecificUsersName(6, 'David');
-getAllUsers();
+// updateSpecificUsersName(6, 'David');
+// getAllUsers();
 
 // 4. Delete
+    //4.1 Delete a specific user from the DB.
+const deleteSpecificUserName = userId => {
+    db.none(`
+    DELETE FROM users 
+        WHERE id = $1;
+    `, userId)
+    .then(()=>{
+        console.log('Deleted');
+    })
+    .catch((e)=>{
+        console.log(e);
+    })
+}
 
-
-
+// deleteSpecificUserName(8);
+// deleteSpecificUserName(9);
+// deleteSpecificUserName(10);
+getAllUsers();
 
 //Its okay to leave this out for an express app, BUT
 // for our command line app, we want this in here so we can
